@@ -16,7 +16,7 @@
     """,
 	"author": "Tecserca",
 	"website": "https://www.linkedin.com/in/wpadilla/",
-	"price": 99.99,
+	"price": ,
 	"currency": "EUR",
 	"depends": [
 		"base",
@@ -42,7 +42,7 @@
 	"installable": True,
 	"auto_install": False,
 	"application": True,
-	"license": "AGPL-3",
+	"license": "LGPL-3",
 	"images": [
 		"static/description/Captura desde 2025-09-14 01-30-27.png",
 		"static/description/Captura desde 2025-09-14 01-31-03.png",
