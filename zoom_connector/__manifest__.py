@@ -14,7 +14,7 @@
         - Dashboard personalizado
         - Integración con Helpdesk (tickets)
     """,
-	"author": "Tecserca",
+	"author": "TechSolutions",
 	"website": "https://www.linkedin.com/in/wpadilla/",
 	"price": "24.99",
 	"currency": "USD",
