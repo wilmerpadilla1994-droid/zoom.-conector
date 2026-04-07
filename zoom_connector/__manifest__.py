@@ -16,8 +16,8 @@
     """,
 	"author": "Tecserca",
 	"website": "https://www.linkedin.com/in/wpadilla/",
-	"price": ,
-	"currency": "EUR",
+	"price": "24.99",
+	"currency": "USD",
 	"depends": [
 		"base",
 		"mail",
