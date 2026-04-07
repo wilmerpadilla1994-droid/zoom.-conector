@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo con gradiente -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D8CFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E5F99;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="zoomGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D8CFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E5F99;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo redondeado -->
+  <rect width="128" height="128" rx="20" ry="20" fill="url(#bgGradient)"/>
+  
+  <!-- Círculo principal de Zoom -->
+  <circle cx="64" cy="64" r="45" fill="white" opacity="0.95"/>
+  
+  <!-- Icono de video/cámara -->
+  <g transform="translate(64, 64)">
+    <!-- Cuerpo de la cámara -->
+    <rect x="-20" y="-12" width="40" height="24" rx="4" fill="url(#zoomGradient)"/>
+    
+    <!-- Lente -->
+    <circle cx="0" cy="0" r="12" fill="white"/>
+    <circle cx="0" cy="0" r="8" fill="url(#zoomGradient)"/>
+    <circle cx="0" cy="0" r="4" fill="white"/>
+    
+    <!-- Flash -->
+    <rect x="15" y="-8" width="6" height="4" rx="1" fill="white" opacity="0.8"/>
+    
+    <!-- Visor -->
+    <rect x="-18" y="-10" width="8" height="6" rx="1" fill="white" opacity="0.6"/>
+  </g>
+  
+  <!-- Texto "ZOOM" -->
+  <text x="64" y="110" font-family="Arial, sans-serif" font-size="12" font-weight="bold" 
+        text-anchor="middle" fill="white" opacity="0.9">ZOOM</text>
+  
+  <!-- Efecto de brillo -->
+  <ellipse cx="45" cy="45" rx="15" ry="15" fill="white" opacity="0.3"/>
+</svg>

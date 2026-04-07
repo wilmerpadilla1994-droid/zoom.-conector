@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de lista para asistentes de reuniones Zoom -->
+    <record id="view_zoom_meeting_attendee_tree" model="ir.ui.view">
+        <field name="name">zoom.meeting.attendee.tree</field>
+        <field name="model">zoom.meeting.attendee</field>
+        <field name="arch" type="xml">
+            <list string="Asistentes de Reuniones Zoom" 
+                  decoration-info="status=='invited'" 
+                  decoration-success="status=='confirmed'" 
+                  decoration-primary="status=='attended'" 
+                  decoration-muted="status=='declined'" 
+                  decoration-danger="status=='no_show'">
+                <field name="meeting_id"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="status"/>
+                <field name="invitation_sent"/>
+                <field name="confirmation_date"/>
+                <field name="is_confirmed"/>
+                <field name="is_attended"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para asistentes de reuniones Zoom -->
+    <record id="view_zoom_meeting_attendee_form" model="ir.ui.view">
+        <field name="name">zoom.meeting.attendee.form</field>
+        <field name="model">zoom.meeting.attendee</field>
+        <field name="arch" type="xml">
+            <form string="Asistente de Reunión Zoom">
+                <header>
+                    <button name="action_confirm_attendance" string="Confirmar Asistencia" type="object" 
+                            class="btn-primary" invisible="status != 'invited'"/>
+                    <button name="action_mark_attended" string="Marcar como Asistió" type="object" 
+                            class="btn-success" invisible="status != 'confirmed'"/>
+                    <button name="action_mark_no_show" string="Marcar como No Asistió" type="object" 
+                            class="btn-warning" invisible="status not in ['confirmed', 'invited']"/>
+                    <button name="action_resend_invitation" string="Reenviar Invitación" type="object" 
+                            class="btn-secondary" invisible="status not in ['invited', 'declined']"/>
+                    <button name="action_send_reminder" string="Enviar Recordatorio" type="object" 
+                            class="btn-info" icon="fa-bell" invisible="status != 'confirmed'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="invited,confirmed,attended"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_confirm_attendance" type="object" class="oe_stat_button" icon="fa-check">
+                            <field name="is_confirmed" widget="statinfo" string="Confirmado"/>
+                        </button>
+                        <button name="action_mark_attended" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="is_attended" widget="statinfo" string="Asistió"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nombre del asistente..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="meeting_id" readonly="1"/>
+                            <field name="email" required="1"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="invitation_sent" readonly="1"/>
+                            <field name="confirmation_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="response_notes" placeholder="Comentarios adicionales del asistente..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para asistentes de reuniones Zoom -->
+    <record id="view_zoom_meeting_attendee_search" model="ir.ui.view">
+        <field name="name">zoom.meeting.attendee.search</field>
+        <field name="model">zoom.meeting.attendee</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Asistentes">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="meeting_id"/>
+                <separator/>
+                <filter string="Invitados" name="invited" domain="[('status', '=', 'invited')]"/>
+                <filter string="Confirmados" name="confirmed" domain="[('status', '=', 'confirmed')]"/>
+                <filter string="Asistieron" name="attended" domain="[('status', '=', 'attended')]"/>
+                <filter string="Rechazados" name="declined" domain="[('status', '=', 'declined')]"/>
+                <filter string="No Asistieron" name="no_show" domain="[('status', '=', 'no_show')]"/>
+                <separator/>
+                <filter string="Con Invitación Enviada" name="invitation_sent" domain="[('invitation_sent', '!=', False)]"/>
+                <filter string="Sin Invitación" name="no_invitation" domain="[('invitation_sent', '=', False)]"/>
+                <filter string="Con Confirmación" name="confirmed_date" domain="[('confirmation_date', '!=', False)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Estado" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Reunión" name="group_meeting" context="{'group_by': 'meeting_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción y menú para asistentes se definen en zoom_meeting_views.xml -->
+
+</odoo>

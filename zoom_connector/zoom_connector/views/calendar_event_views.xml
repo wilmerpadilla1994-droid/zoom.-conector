@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Acción para calendario con filtro de Zoom -->
+        <record id="action_calendar_event_zoom" model="ir.actions.act_window">
+            <field name="name">Calendario Zoom</field>
+            <field name="res_model">calendar.event</field>
+            <field name="view_mode">calendar,form</field>
+            <field name="domain">[('is_zoom_meeting', '=', True)]</field>
+            <field name="context">{
+                'default_is_zoom_meeting': True,
+                'default_show_as': 'busy',
+            }</field>
+        </record>
+        
+        
+    </data>
+</odoo>

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para configuración de Zoom -->
+    <record id="view_zoom_config_form" model="ir.ui.view">
+        <field name="name">zoom.config.form</field>
+        <field name="model">zoom.config</field>
+        <field name="arch" type="xml">
+            <form string="Configuración de Zoom">
+                <header>
+                    <button name="test_connection" string="💾 Guardar y Probar Conexión" type="object" 
+                            class="btn-primary" icon="fa-save"/>
+                    <button name="check_config_status" string="🔄 Verificar Estado" type="object" 
+                            class="btn-info" icon="fa-refresh"/>
+                    <button name="reset_config" string="⚠️ Resetear Configuración" type="object" 
+                            class="btn-warning" invisible="not is_configured" icon="fa-undo"/>
+                    <button name="sync_meetings_manually" string="🔄 Sincronizar Reuniones" type="object" 
+                            class="btn-secondary" invisible="not is_configured" icon="fa-sync"/>
+                    <button name="sync_meetings_automatically" string="⚡ Sincronización Automática" type="object" 
+                            class="btn-success" invisible="not is_configured" icon="fa-magic"/>
+                    <field name="is_configured" invisible="1"/>
+                    <field name="connection_status" invisible="1"/>
+                </header>
+                <sheet>
+                    <!-- Título eliminado - información redundante -->
+                    
+                    <!-- Alertas dinámicas según el estado -->
+                    <div t-attf-class="alert alert-#{connection_status == 'connected' ? 'success' : connection_status == 'error' ? 'danger' : 'info'}" role="alert">
+                        <h4><field name="config_status" readonly="1"/></h4>
+                        
+                        <!-- Estado: Conectado -->
+                        <div invisible="connection_status != 'connected'">
+                            <div class="o_zoom_status_connected">
+                                <p><i class="fa fa-check-circle"/> La configuración de Zoom está activa y funcionando correctamente.</p>
+                                <p><i class="fa fa-sync"/> <strong>Sincronización automática:</strong> Las reuniones se sincronizan automáticamente después de cada configuración exitosa.</p>
+                                <ul>
+                                    <li><strong>Estado de conexión:</strong> <span class="badge badge-success"><field name="connection_status" readonly="1"/></span></li>
+                                    <li><strong>Token expira:</strong> <field name="token_expires" readonly="1"/></li>
+                                    <li><strong>Base URL:</strong> <field name="base_url" readonly="1"/></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado: Error -->
+                        <div invisible="connection_status != 'error'">
+                            <div class="o_zoom_status_error">
+                                <p><i class="fa fa-exclamation-triangle"/> Error en la conexión con Zoom API.</p>
+                                <p>Verifique las credenciales y vuelva a probar la conexión.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado: Configurado pero no probado -->
+                        <div invisible="connection_status != 'configured'">
+                            <div class="o_zoom_status_configured">
+                                <p><i class="fa fa-cog"/> Las credenciales están guardadas. Pruebe la conexión para verificar.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado: No configurado -->
+                        <div invisible="connection_status != 'not_configured'">
+                            <div class="o_zoom_status_not_configured">
+                                <p><i class="fa fa-info-circle"/> Para usar el módulo de Zoom, necesitas configurar las credenciales de la API.</p>
+                                <p><strong>Pasos a seguir:</strong></p>
+                                <ol>
+                                    <li>Complete los campos de credenciales (Client ID, Client Secret, Account ID)</li>
+                                    <li>Haga clic en <strong>"💾 Guardar y Probar Conexión"</strong> para guardar y verificar</li>
+                                    <li>Use <strong>"🔄 Verificar Estado"</strong> para sincronizar el estado</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <group>
+                        <group string="Credenciales de Zoom">
+                            <field name="account_id" placeholder="Account ID"/>
+                            <field name="client_id" placeholder="Client ID (API Key)"/>
+                            <field name="client_secret" password="True" placeholder="Client Secret (API Secret)"/>
+                            <field name="use_webhooks" string="Activar Webhooks"/>
+                            <field name="webhook_secret" password="True" placeholder="Webhook Secret"/>
+                        </group>
+                        <group string="Estado Actual" invisible="not is_configured">
+                            <field name="client_id" readonly="1" string="Client ID Actual"/>
+                            <field name="account_id" readonly="1" string="Account ID Actual"/>
+                            <field name="connection_status" readonly="1"/>
+                            <field name="token_expires" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Configuración API">
+                        <field name="base_url" readonly="1"/>
+                        <field name="access_token" password="True" readonly="1"/>
+                        <field name="token_expires" readonly="1"/>
+                        <field name="connection_status" readonly="1"/>
+                    </group>
+                    
+                    <group string="Configuración de Reuniones">
+                        <group>
+                            <field name="auto_record"/>
+                            <field name="waiting_room"/>
+                        </group>
+                        <group>
+                            <field name="join_before_host"/>
+                            <field name="mute_on_entry"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Información" name="info">
+                            <div class="alert alert-info" role="alert">
+                                <h4>Instrucciones de Configuración:</h4>
+                                <ol>
+                                    <li>Ve a <a href="https://marketplace.zoom.us" target="_blank">Zoom Marketplace</a></li>
+                                    <li>Crea una nueva aplicación OAuth2</li>
+                                    <li>Copia las credenciales a los campos correspondientes</li>
+                                    <li>Configura la URL de redirección: <code>http://tu-dominio-odoo.com/zoom/oauth/callback</code></li>
+                                    <li>Haz clic en "Probar Conexión" para verificar</li>
+                                </ol>
+                            </div>
+                            
+                        </page>
+                        
+                        <page string="Webhooks" name="webhooks">
+                            <div class="alert alert-info" role="alert">
+                                <h4>Configuración de Webhooks:</h4>
+                                <p>Para recibir actualizaciones automáticas de Zoom, configura los siguientes endpoints:</p>
+                                <ul>
+                                    <li><strong>URL de Webhook:</strong> <code>http://tu-dominio-odoo.com/zoom/webhook</code></li>
+                                    <li><strong>Eventos a suscribir:</strong></li>
+                                    <ul>
+                                        <li>meeting.started</li>
+                                        <li>meeting.ended</li>
+                                        <li>meeting.updated</li>
+                                        <li>meeting.deleted</li>
+                                        <li>meeting.participant_joined</li>
+                                        <li>meeting.participant_left</li>
+                                    </ul>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <!-- Estilos CSS personalizados para la configuración -->
+                <style>
+                    /* Estados de configuración */
+                    .o_zoom_status_connected {
+                        color: #155724;
+                    }
+                    
+                    .o_zoom_status_connected .fa-check-circle {
+                        color: #28a745;
+                        font-size: 18px;
+                    }
+                    
+                    .o_zoom_status_error {
+                        color: #721c24;
+                    }
+                    
+                    .o_zoom_status_error .fa-exclamation-triangle {
+                        color: #dc3545;
+                        font-size: 18px;
+                    }
+                    
+                    .o_zoom_status_configured {
+                        color: #0c5460;
+                    }
+                    
+                    .o_zoom_status_configured .fa-cog {
+                        color: #17a2b8;
+                        font-size: 18px;
+                    }
+                    
+                    .o_zoom_status_not_configured {
+                        color: #0c5460;
+                    }
+                    
+                    .o_zoom_status_not_configured .fa-info-circle {
+                        color: #17a2b8;
+                        font-size: 18px;
+                    }
+                    
+                    /* Badges personalizados */
+                    .badge-success {
+                        background-color: #28a745;
+                        color: white;
+                        padding: 4px 8px;
+                        border-radius: 12px;
+                        font-size: 11px;
+                        font-weight: 500;
+                    }
+                    
+                    /* Botones mejorados */
+                    .o_form_statusbar .btn {
+                        border-radius: 20px;
+                        font-weight: 500;
+                        padding: 8px 16px;
+                        margin: 0 5px;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .o_form_statusbar .btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    }
+                    
+                    /* Campos de credenciales */
+                    .o_field_widget[placeholder*="Client ID"],
+                    .o_field_widget[placeholder*="Client Secret"],
+                    .o_field_widget[placeholder*="Account ID"] {
+                        font-family: 'Courier New', monospace;
+                        background: #f8f9fa;
+                        border: 2px solid #e9ecef;
+                        border-radius: 6px;
+                        padding: 10px;
+                        transition: border-color 0.3s ease;
+                    }
+                    
+                    .o_field_widget[placeholder*="Client ID"]:focus,
+                    .o_field_widget[placeholder*="Client Secret"]:focus,
+                    .o_field_widget[placeholder*="Account ID"]:focus {
+                        border-color: #2D8CFF;
+                        box-shadow: 0 0 0 0.2rem rgba(45, 140, 255, 0.25);
+                    }
+                    
+                    /* Alertas mejoradas */
+                    .alert {
+                        border-radius: 10px;
+                        border: none;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        margin-bottom: 20px;
+                    }
+                    
+                    .alert-success {
+                        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                        border-left: 4px solid #28a745;
+                    }
+                    
+                    .alert-danger {
+                        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+                        border-left: 4px solid #dc3545;
+                    }
+                    
+                    .alert-info {
+                        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+                        border-left: 4px solid #17a2b8;
+                    }
+                    
+                    /* Título dinámico */
+                    .oe_title h1 {
+                        transition: color 0.3s ease;
+                    }
+                    
+                    /* Campos de solo lectura mejorados */
+                    .o_field_widget[readonly="1"] {
+                        background: #e9ecef;
+                        border-radius: 6px;
+                        padding: 8px;
+                        font-weight: 500;
+                    }
+                    
+                    /* Animaciones removidas - estado estático */
+                </style>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de lista para configuraciones -->
+    <record id="view_zoom_config_list" model="ir.ui.view">
+        <field name="name">zoom.config.list</field>
+        <field name="model">zoom.config</field>
+        <field name="arch" type="xml">
+            <list string="Configuraciones de Zoom">
+                <field name="client_id" string="Client ID"/>
+                <field name="account_id" string="Account ID"/>
+                <field name="connection_status" string="Estado"/>
+                <field name="is_configured" string="Configurado"/>
+                <field name="token_expires" string="Token Expira"/>
+                <field name="create_date" string="Creado"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Acción de ventana para configuración -->
+    <record id="action_zoom_config" model="ir.actions.act_window">
+        <field name="name">Configuración de Zoom</field>
+        <field name="res_model">zoom.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <!-- Menú de configuración -->
+    <menuitem id="menu_zoom_config" 
+              name="Configuración" 
+              parent="menu_zoom_main" 
+              action="action_zoom_config" 
+              sequence="20"/>
+
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron jobs deshabilitados temporalmente para evitar problemas de instalación -->
+    <!-- Se pueden habilitar manualmente después de la instalación exitosa -->
+    
+    <!-- Cron job para enviar recordatorios automáticos -->
+    <record id="ir_cron_send_meeting_reminders" model="ir.cron">
+        <field name="name">Enviar Recordatorios de Reuniones Zoom</field>
+        <field name="model_id" ref="zoom_connector.model_zoom_meeting"/>
+        <field name="state">code</field>
+        <field name="code">model._send_automatic_reminders()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="True"/>
+    </record>
+    
+    <!-- Cron job para sincronización automática con Zoom -->
+    <record id="ir_cron_sync_zoom_meetings" model="ir.cron">
+        <field name="name">Sincronizar Reuniones con Zoom</field>
+        <field name="model_id" ref="zoom_connector.model_zoom_config"/>
+        <field name="state">code</field>
+        <field name="code">model._sync_meetings_automatically()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

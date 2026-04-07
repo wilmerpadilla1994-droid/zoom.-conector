@@ -1,0 +1,817 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista principal de Zoom con panel lateral -->
+    <record id="view_zoom_dashboard" model="ir.ui.view">
+        <field name="name">zoom.dashboard</field>
+        <field name="model">zoom.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard de Zoom" create="false" edit="false">
+                <header>
+                    <h1>Tablero</h1>
+                </header>
+                <div class="o_zoom_dashboard">
+                    <!-- Panel lateral izquierdo -->
+                    <div class="o_zoom_sidebar">
+                        <div class="o_zoom_sidebar_header">
+                            <h3><i class="fa fa-video-camera"/> Centro de Control Zoom</h3>
+                        </div>
+                        
+                        <!-- Reuniones -->
+                        <div class="o_zoom_quick_actions">
+                            <h4>Reunión</h4>
+                            <a href="/web#action=zoom_connector.action_create_instant_meeting" class="btn btn-success o_zoom_quick_btn">
+                                <i class="fa fa-play"/> Iniciar Reunión
+                            </a>
+                            <a href="/web#action=zoom_connector.action_zoom_meeting&amp;view_mode=form" class="btn btn-primary o_zoom_quick_btn">
+                                <i class="fa fa-plus"/> Crear Reunión
+                            </a>
+                        </div>
+
+                        <!-- Navegación rápida -->
+                        <div class="o_zoom_navigation">
+                            <h4>Navegación</h4>
+                            <a href="/web#action=zoom_connector.action_zoom_meeting" class="btn btn-secondary o_zoom_quick_btn">
+                                <i class="fa fa-list"/> Ver Reuniones
+                            </a>
+                            <a href="/web#action=zoom_connector.action_active_meetings" class="btn btn-info o_zoom_quick_btn">
+                                <i class="fa fa-play-circle"/> Activas
+                            </a>
+                            <a href="/web#action=zoom_connector.action_zoom_meeting_calendar" class="btn btn-success o_zoom_quick_btn">
+                                <i class="fa fa-calendar"/> Calendario
+                            </a>
+                        </div>
+
+                        <!-- Información de Configuración -->
+                        <div class="o_zoom_config_info">
+                            <h4>Estado de Conexión</h4>
+
+                            <!-- Estado de conexión -->
+                            <div class="o_zoom_config_item">
+                                <div class="o_zoom_config_icon o_zoom_config_status_icon">
+                                    <i class="fa fa-check-circle" invisible="config_status_icon != 'fa-check-circle'"/>
+                                    <i class="fa fa-exclamation-triangle" invisible="config_status_icon != 'fa-exclamation-triangle'"/>
+                                    <i class="fa fa-cog" invisible="config_status_icon != 'fa-cog'"/>
+                                </div>
+                                <div class="o_zoom_config_content">
+                                    <span class="o_zoom_config_label">Estado:</span>
+                                    <span class="o_zoom_config_value"><field name="connection_status" readonly="1"/></span>
+                                </div>
+                            </div>
+
+                            <!-- Última sincronización -->
+                            <div class="o_zoom_config_item" invisible="not last_sync">
+                                <div class="o_zoom_config_icon" style="color: #17a2b8;">
+                                    <i class="fa fa-sync"/>
+                                </div>
+                                <div class="o_zoom_config_content">
+                                    <span class="o_zoom_config_label">Última Sync:</span>
+                                    <span class="o_zoom_config_value"><field name="last_sync" readonly="1"/></span>
+                                </div>
+                            </div>
+
+                            <!-- Token expira -->
+                            <div class="o_zoom_config_item" invisible="token_expires_in == 'N/A'">
+                                <div class="o_zoom_config_icon" style="color: #f39c12;">
+                                    <i class="fa fa-clock-o"/>
+                                </div>
+                                <div class="o_zoom_config_content">
+                                    <span class="o_zoom_config_label">Token:</span>
+                                    <span class="o_zoom_config_value"><field name="token_expires_in" readonly="1"/></span>
+                                </div>
+                            </div>
+
+                            <!-- Campos ocultos para el estado -->
+                            <field name="config_status_icon" invisible="1"/>
+                            <field name="config_status_color" invisible="1"/>
+                        </div>
+
+                        <!-- Configuración rápida -->
+                        <div class="o_zoom_config_quick">
+                            <h4>Configuración</h4>
+                            <a href="/web#action=zoom_connector.action_zoom_config" class="btn btn-info o_zoom_quick_btn">
+                                <i class="fa fa-cog"/> Configurar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Contenido principal -->
+                    <div class="o_zoom_main_content">
+                        <!-- Estadísticas con gráficos -->
+                        <div class="o_zoom_stats_section">
+                            <h2>📊 Estadísticas de Reuniones</h2>
+                            <div class="o_zoom_stats_grid">
+                                <div class="o_zoom_stat_card o_zoom_stat_total">
+                                    <div class="o_zoom_stat_icon">
+                                        <i class="fa fa-video-camera"/>
+                                    </div>
+                                    <div class="o_zoom_stat_content">
+                                        <h3><field name="total_meetings"/></h3>
+                                        <p>Total Reuniones</p>
+                                    </div>
+                                </div>
+
+                                <div class="o_zoom_stat_card o_zoom_stat_active">
+                                    <div class="o_zoom_stat_icon">
+                                        <i class="fa fa-play-circle"/>
+                                    </div>
+                                    <div class="o_zoom_stat_content">
+                                        <h3><field name="active_meetings"/></h3>
+                                        <p>Reuniones Activas</p>
+                                    </div>
+                                </div>
+
+                                <div class="o_zoom_stat_card o_zoom_stat_scheduled">
+                                    <div class="o_zoom_stat_icon">
+                                        <i class="fa fa-clock-o"/>
+                                    </div>
+                                    <div class="o_zoom_stat_content">
+                                        <h3><field name="scheduled_meetings"/></h3>
+                                        <p>Programadas</p>
+                                    </div>
+                                </div>
+
+                                <div class="o_zoom_stat_card o_zoom_stat_finished">
+                                    <div class="o_zoom_stat_icon">
+                                        <i class="fa fa-check-circle"/>
+                                    </div>
+                                    <div class="o_zoom_stat_content">
+                                        <h3><field name="finished_meetings"/></h3>
+                                        <p>Finalizadas</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acciones principales -->
+                        <div class="o_zoom_actions_section">
+                            <h2>🚀 Acciones Rápidas</h2>
+                            <div class="o_zoom_actions_grid">
+                                <div class="o_zoom_action_card o_zoom_action_primary">
+                                    <div class="o_zoom_action_icon">
+                                        <i class="fa fa-video-camera"/>
+                                    </div>
+                                    <h4>Ver Todas las Reuniones</h4>
+                                    <p>Gestiona todas tus reuniones Zoom</p>
+                                    <button name="action_view_meetings" type="object" class="btn btn-primary">
+                                        <i class="fa fa-list"/> Ver Reuniones
+                                    </button>
+                                </div>
+
+                                <div class="o_zoom_action_card o_zoom_action_success">
+                                    <div class="o_zoom_action_icon">
+                                        <i class="fa fa-plus-circle"/>
+                                    </div>
+                                    <h4>Crear Reunión Rápida</h4>
+                                    <p>Crea una nueva reunión Zoom de forma rápida</p>
+                                    <button name="action_create_quick_meeting" type="object" class="btn btn-success">
+                                        <i class="fa fa-plus"/> Crear Reunión
+                                    </button>
+                                </div>
+
+                                <div class="o_zoom_action_card o_zoom_action_info">
+                                    <div class="o_zoom_action_icon">
+                                        <i class="fa fa-calendar"/>
+                                    </div>
+                                    <h4>Ver Calendario</h4>
+                                    <p>Calendario de Reuniones</p>
+                                    <button name="action_view_calendar" type="object" class="btn btn-info">
+                                        <i class="fa fa-calendar"/> Ver Calendario
+                                    </button>
+                                </div>
+
+                                <div class="o_zoom_action_card o_zoom_action_warning">
+                                    <div class="o_zoom_action_icon">
+                                        <i class="fa fa-sync"/>
+                                    </div>
+                                    <h4>Sincronizar con Zoom</h4>
+                                    <p>Sincroniza las reuniones desde tu cuenta de Zoom</p>
+                                    <button name="action_sync_meetings" type="object" class="btn btn-warning">
+                                        <i class="fa fa-sync"/> Sincronizar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reuniones recientes y próximas -->
+                        <div class="o_zoom_meetings_section">
+                            <h2>📅 Reuniones Recientes y Próximas</h2>
+
+                            <div class="o_zoom_meetings_grid">
+                                <div class="o_zoom_meeting_card">
+                                    <div class="o_zoom_meeting_header">
+                                        <h5>Reuniones Recientes</h5>
+                                        <span class="o_zoom_meeting_status" style="background-color: #95a5a6;">
+                                            <i class="fa fa-history"/> Recientes
+                                        </span>
+                                    </div>
+                                    <div class="o_zoom_meeting_info">
+                                        <p>Ver las últimas 5 reuniones finalizadas o canceladas</p>
+                                    </div>
+                                    <div class="o_zoom_meeting_actions">
+                                        <button name="action_view_meetings" type="object" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-list"/> Ver Reuniones
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="o_zoom_meeting_card">
+                                    <div class="o_zoom_meeting_header">
+                                        <h5>Próximas Reuniones</h5>
+                                        <span class="o_zoom_meeting_status" style="background-color: #3498db;">
+                                            <i class="fa fa-clock-o"/> Próximas
+                                        </span>
+                                    </div>
+                                    <div class="o_zoom_meeting_info">
+                                        <p>Ver las próximas reuniones programadas</p>
+                                    </div>
+                                    <div class="o_zoom_meeting_actions">
+                                        <button name="action_view_calendar" type="object" class="btn btn-info btn-sm">
+                                            <i class="fa fa-calendar"/> Ver Calendario
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estilos CSS personalizados -->
+                <style>
+                    .o_zoom_dashboard {
+                        display: flex;
+                        min-height: 100vh;
+                        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                    }
+
+                    /* Sección de estadísticas */
+                    .o_zoom_stats_section {
+                        padding: 20px;
+                        margin-bottom: 30px;
+                    }
+
+                    .o_zoom_stats_section h2 {
+                        color: #2c3e50;
+                        margin-bottom: 25px;
+                        text-align: center;
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+
+                    .o_zoom_stats_grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 20px;
+                        max-width: 1000px;
+                        margin: 0 auto;
+                    }
+
+                    .o_zoom_stat_card {
+                        background: white;
+                        border-radius: 15px;
+                        padding: 20px;
+                        display: flex;
+                        align-items: center;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                        transition: all 0.3s ease;
+                        border-left: 5px solid;
+                    }
+
+                    .o_zoom_stat_card:hover {
+                        transform: translateY(-3px);
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                    }
+
+                    .o_zoom_stat_total { border-left-color: #3498db; }
+                    .o_zoom_stat_active { border-left-color: #27ae60; }
+                    .o_zoom_stat_scheduled { border-left-color: #f39c12; }
+                    .o_zoom_stat_finished { border-left-color: #95a5a6; }
+
+                    .o_zoom_stat_icon {
+                        font-size: 36px;
+                        margin-right: 15px;
+                        width: 60px;
+                        text-align: center;
+                    }
+
+                    .o_zoom_stat_total .o_zoom_stat_icon { color: #3498db; }
+                    .o_zoom_stat_active .o_zoom_stat_icon { color: #27ae60; }
+                    .o_zoom_stat_scheduled .o_zoom_stat_icon { color: #f39c12; }
+                    .o_zoom_stat_finished .o_zoom_stat_icon { color: #95a5a6; }
+
+                    .o_zoom_stat_content h3 {
+                        font-size: 28px;
+                        font-weight: bold;
+                        margin: 0;
+                        color: #2c3e50;
+                    }
+
+                    .o_zoom_stat_content p {
+                        margin: 5px 0 0 0;
+                        color: #7f8c8d;
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+
+                    /* Sección de acciones */
+                    .o_zoom_actions_section {
+                        padding: 20px;
+                        margin-bottom: 30px;
+                    }
+
+                    .o_zoom_actions_section h2 {
+                        color: #2c3e50;
+                        margin-bottom: 30px;
+                        text-align: center;
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+
+                    .o_zoom_actions_grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                        gap: 25px;
+                        max-width: 1200px;
+                        margin: 0 auto;
+                    }
+
+                    .o_zoom_action_card {
+                        background: white;
+                        border-radius: 15px;
+                        padding: 30px;
+                        text-align: center;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                        transition: all 0.3s ease;
+                        border-top: 4px solid;
+                    }
+
+                    .o_zoom_action_card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                    }
+
+                    .o_zoom_action_primary { border-top-color: #3498db; }
+                    .o_zoom_action_success { border-top-color: #27ae60; }
+                    .o_zoom_action_info { border-top-color: #17a2b8; }
+                    .o_zoom_action_warning { border-top-color: #ffc107; }
+
+                    .o_zoom_action_icon {
+                        font-size: 48px;
+                        margin-bottom: 20px;
+                        display: block;
+                    }
+
+                    .o_zoom_action_primary .o_zoom_action_icon { color: #3498db; }
+                    .o_zoom_action_success .o_zoom_action_icon { color: #27ae60; }
+                    .o_zoom_action_info .o_zoom_action_icon { color: #17a2b8; }
+                    .o_zoom_action_warning .o_zoom_action_icon { color: #ffc107; }
+
+                    .o_zoom_action_card h4 {
+                        color: #2c3e50;
+                        margin-bottom: 15px;
+                        font-size: 18px;
+                        font-weight: 600;
+                    }
+
+                    .o_zoom_action_card p {
+                        color: #7f8c8d;
+                        margin-bottom: 25px;
+                        line-height: 1.6;
+                        font-size: 14px;
+                    }
+
+                    .o_zoom_action_card .btn {
+                        width: 100%;
+                        padding: 12px 20px;
+                        font-weight: 600;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                    /* Sección de reuniones */
+                    .o_zoom_meetings_section {
+                        padding: 20px;
+                        background: white;
+                        border-radius: 15px;
+                        margin: 20px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    }
+
+                    .o_zoom_meetings_tabs {
+                        display: flex;
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #e9ecef;
+                    }
+
+                    .o_zoom_tab_btn {
+                        background: none;
+                        border: none;
+                        padding: 15px 25px;
+                        font-size: 16px;
+                        font-weight: 500;
+                        color: #6c757d;
+                        cursor: pointer;
+                        border-bottom: 3px solid transparent;
+                        transition: all 0.3s ease;
+                    }
+
+                    .o_zoom_tab_btn.active {
+                        color: #2D8CFF;
+                        border-bottom-color: #2D8CFF;
+                    }
+
+                    .o_zoom_tab_btn:hover {
+                        color: #2D8CFF;
+                    }
+
+                    .o_zoom_tab_content {
+                        display: none;
+                    }
+
+                    .o_zoom_tab_content.active {
+                        display: block;
+                    }
+
+                    .o_zoom_tab_content h4 {
+                        color: #2c3e50;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                        font-weight: 600;
+                    }
+
+                    /* Grid de reuniones */
+                    .o_zoom_meetings_grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                        gap: 20px;
+                        margin-top: 20px;
+                    }
+
+                    .o_zoom_meeting_card {
+                        background: white;
+                        border-radius: 12px;
+                        padding: 20px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        border-left: 4px solid #3498db;
+                        transition: all 0.3s ease;
+                    }
+
+                    .o_zoom_meeting_card:hover {
+                        transform: translateY(-3px);
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+                    }
+
+                    .o_zoom_meeting_header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 15px;
+                    }
+
+                    .o_zoom_meeting_header h5 {
+                        margin: 0;
+                        color: #2c3e50;
+                        font-size: 16px;
+                        font-weight: 600;
+                    }
+
+                    .o_zoom_meeting_status {
+                        color: white;
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        text-transform: uppercase;
+                        font-weight: 500;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                    }
+
+                    .o_zoom_meeting_info p {
+                        margin: 8px 0;
+                        color: #7f8c8d;
+                        font-size: 13px;
+                        line-height: 1.5;
+                    }
+
+                    .o_zoom_meeting_actions {
+                        margin-top: 15px;
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    .o_zoom_meeting_actions .btn {
+                        flex: 1;
+                        font-size: 12px;
+                        padding: 8px 12px;
+                        border-radius: 6px;
+                        font-weight: 500;
+                    }
+
+                    .o_zoom_sidebar {
+                        width: 300px;
+                        background: #f8f9fa;
+                        color: #495057;
+                        padding: 20px;
+                        overflow: visible;
+                        border-right: 1px solid #dee2e6;
+                    }
+
+                    .o_zoom_sidebar_header h3 {
+                        color: #495057;
+                        margin-bottom: 30px;
+                        font-size: 18px;
+                        font-weight: 600;
+                    }
+
+                    .o_zoom_quick_actions, .o_zoom_navigation, .o_zoom_config_info, .o_zoom_config_quick {
+                        margin-bottom: 30px;
+                    }
+
+                    .o_zoom_quick_actions h4, .o_zoom_navigation h4, .o_zoom_config_info h4, .o_zoom_config_quick h4 {
+                        color: #6c757d;
+                        margin-bottom: 15px;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        font-weight: 500;
+                    }
+
+                    /* Estilos para información de configuración */
+                    .o_zoom_config_info {
+                        background: white;
+                        border-radius: 8px;
+                        padding: 15px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    }
+
+                    .o_zoom_config_item {
+                        display: flex;
+                        align-items: center;
+                        padding: 8px 0;
+                        border-bottom: 1px solid #f1f3f4;
+                    }
+
+                    .o_zoom_config_item:last-child {
+                        border-bottom: none;
+                    }
+
+                    .o_zoom_config_icon {
+                        width: 20px;
+                        margin-right: 10px;
+                        text-align: center;
+                        font-size: 14px;
+                    }
+
+                    /* Colores dinámicos para iconos de estado */
+                    .o_zoom_config_status_icon .fa-check-circle {
+                        color: #28a745;
+                    }
+
+                    .o_zoom_config_status_icon .fa-exclamation-triangle {
+                        color: #dc3545;
+                    }
+
+                    .o_zoom_config_status_icon .fa-cog {
+                        color: #17a2b8;
+                    }
+
+                    .o_zoom_config_content {
+                        flex: 1;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .o_zoom_config_label {
+                        color: #6c757d;
+                        font-size: 12px;
+                        font-weight: 500;
+                    }
+
+                    .o_zoom_config_value {
+                        color: #495057;
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-transform: capitalize;
+                    }
+
+                    .o_zoom_quick_btn {
+                        width: 100%;
+                        margin-bottom: 10px;
+                        padding: 12px;
+                        border-radius: 6px;
+                        font-weight: bold;
+                    }
+
+                    /* Estilos de estadísticas eliminados - reemplazados por información de configuración */
+
+                    .o_zoom_main_content {
+                        flex: 1;
+                        padding: 20px;
+                        overflow-y: auto;
+                    }
+
+                    .o_zoom_content_header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 30px;
+                        padding-bottom: 15px;
+                        border-bottom: 2px solid #e9ecef;
+                    }
+
+                    .o_zoom_content_header h2 {
+                        color: #2c3e50;
+                        margin: 0;
+                    }
+
+                    .o_zoom_view_switcher .btn {
+                        margin-left: 5px;
+                    }
+
+                    .o_zoom_meetings_section {
+                        margin-bottom: 40px;
+                    }
+
+                    .o_zoom_meetings_section h4 {
+                        color: #2c3e50;
+                        margin-bottom: 20px;
+                        padding: 10px 0;
+                        border-bottom: 1px solid #dee2e6;
+                    }
+
+                    .o_zoom_meetings_grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                        gap: 20px;
+                    }
+
+                    .o_zoom_meeting_card {
+                        background: white;
+                        border-radius: 8px;
+                        padding: 20px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        border-left: 4px solid #3498db;
+                        transition: transform 0.2s;
+                    }
+
+                    .o_zoom_meeting_card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                    }
+
+                    .o_zoom_meeting_active {
+                        border-left-color: #27ae60;
+                    }
+
+                    .o_zoom_meeting_scheduled {
+                        border-left-color: #3498db;
+                    }
+
+                    .o_zoom_meeting_header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 15px;
+                    }
+
+                    .o_zoom_meeting_header h5 {
+                        margin: 0;
+                        color: #2c3e50;
+                        font-size: 16px;
+                    }
+
+                    .o_zoom_meeting_status {
+                        background: #3498db;
+                        color: white;
+                        padding: 4px 8px;
+                        border-radius: 12px;
+                        font-size: 11px;
+                        text-transform: uppercase;
+                    }
+
+                    .o_zoom_meeting_active .o_zoom_meeting_status {
+                        background: #27ae60;
+                    }
+
+                    .o_zoom_meeting_info p {
+                        margin: 5px 0;
+                        color: #7f8c8d;
+                        font-size: 13px;
+                    }
+
+                    .o_zoom_meeting_info i {
+                        width: 15px;
+                        margin-right: 8px;
+                    }
+
+                    .o_zoom_meeting_actions {
+                        margin-top: 15px;
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    .o_zoom_meeting_actions .btn {
+                        flex: 1;
+                        font-size: 12px;
+                        padding: 8px 12px;
+                    }
+                            </style>
+                        </form>
+                    </field>
+                </record>
+
+    <!-- Vista de calendario para reuniones -->
+    <record id="view_zoom_meeting_calendar" model="ir.ui.view">
+        <field name="name">zoom.meeting.calendar</field>
+        <field name="model">zoom.meeting</field>
+        <field name="arch" type="xml">
+            <calendar string="Calendario de Reuniones Zoom"
+                      date_start="start_time"
+                      date_stop="start_time"
+                      color="status">
+                <field name="name"/>
+                <field name="status"/>
+                <field name="duration"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_zoom_meeting_calendar" model="ir.actions.act_window">
+        <field name="name">Calendario de Reuniones</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">calendar,form</field>
+        <field name="view_id" ref="calendar.view_calendar_event_calendar"/>
+        <field name="domain">[('is_zoom_meeting', '=', True)]</field>
+        <field name="context">{
+            'search_default_is_zoom_meeting': 1,
+            'default_is_zoom_meeting': True,
+            'default_show_as': 'busy'
+        }</field>
+    </record>
+
+    <!-- Vista kanban duplicada eliminada - se usa view_zoom_dashboard -->
+
+    <!-- Acción para dashboard principal -->
+    <record id="action_zoom_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard de Zoom</field>
+        <field name="res_model">zoom.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_zoom_dashboard"/>
+        <field name="target">current</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <!-- Menú para dashboard -->
+    <menuitem id="menu_zoom_dashboard"
+              name="Dashboard"
+              parent="menu_zoom_main"
+              action="action_zoom_dashboard"
+              sequence="5"/>
+
+    <!-- Acción para crear reunión instantánea -->
+    <record id="action_create_instant_meeting" model="ir.actions.server">
+        <field name="name">Crear Reunión Instantánea</field>
+        <field name="model_id" ref="zoom_connector.model_zoom_meeting"/>
+        <field name="state">code</field>
+        <field name="code">
+meeting = env['zoom.meeting'].action_create_instant_meeting()
+if meeting:
+    action = meeting
+else:
+    action = {'type': 'ir.actions.client', 'tag': 'reload'}
+        </field>
+    </record>
+
+    <!-- Acción para crear reunión rápida -->
+    <record id="action_create_quick_meeting" model="ir.actions.act_window">
+        <field name="name">Crear Reunión Rápida</field>
+        <field name="res_model">zoom.meeting</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{
+            'default_name': 'Reunión Rápida',
+            'default_start_time': datetime.datetime.now() + datetime.timedelta(minutes=5),
+            'default_status': 'scheduled'
+        }</field>
+    </record>
+
+    <!-- Acción para reuniones activas - ya definida en zoom_meeting_views.xml -->
+
+    <!-- Acción para reuniones programadas -->
+    <record id="action_scheduled_meetings" model="ir.actions.act_window">
+        <field name="name">Reuniones Programadas</field>
+        <field name="res_model">zoom.meeting</field>
+        <field name="view_mode">list,form,calendar</field>
+        <field name="domain">[('status', '=', 'scheduled')]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Menús adicionales -->
+    <!-- Menú "Reunión Rápida" eliminado -->
+
+
+    <!-- Menú "Reuniones Programadas" eliminado - redundante con "Reuniones" -->
+
+</odoo>

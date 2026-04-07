@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Configuración por defecto simplificada -->
+        <record id="zoom_config_default" model="zoom.config">
+            <field name="client_id">your_client_id_here</field>
+            <field name="client_secret">your_client_secret_here</field>
+            <field name="account_id">your_account_id_here</field>
+            <field name="base_url">https://api.zoom.us/v2</field>
+            <field name="auto_record" eval="False"/>
+            <field name="waiting_room" eval="True"/>
+            <field name="join_before_host" eval="False"/>
+            <field name="mute_on_entry" eval="True"/>
+            <field name="use_webhooks" eval="False"/>
+        </record>
+    </data>
+</odoo>

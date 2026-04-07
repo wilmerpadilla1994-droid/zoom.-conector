@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista LIST por defecto para Helpdesk Ticket (asegura vista 'tree') -->
+    <record id="view_helpdesk_ticket_tree_zoom" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.tree.zoom</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <list string="Tickets de Soporte" create="true" edit="true" delete="true" default_order="create_date desc">
+                <field name="name" string="Título"/>
+                <field name="team_id"/>
+                <field name="stage_id"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="priority"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Smart button para reuniones de Zoom en Helpdesk Ticket -->
+    <record id="view_helpdesk_ticket_form_inherit_zoom" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.zoom</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button en la caja de botones -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_create_zoom_meeting"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-plus">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value"><i class="fa fa-video-camera"/></span>
+                        <span class="o_stat_text">Crear Reunión Zoom</span>
+                    </div>
+                </button>
+                <button name="action_view_zoom_meetings"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-video-camera">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value"><field name="zoom_meeting_count"/></span>
+                        <span class="o_stat_text">Reuniones Zoom</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Pestaña de Zoom en el notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Zoom">
+                    <group>
+                        <group>
+                            <button name="action_create_zoom_meeting" string="Crear Reunión" type="object" class="btn-primary" icon="fa-plus"/>
+                            <button name="action_start_instant_zoom" string="Iniciar Instantánea" type="object" class="btn-success" icon="fa-play"/>
+                            <button name="action_join_zoom_meeting" string="Unirse a Activa" type="object" class="btn-info" icon="fa-sign-in"/>
+                        </group>
+                        <group string="Control del Ticket">
+                            <field name="control_total"/>
+                        </group>
+                    </group>
+                    <field name="zoom_meeting_ids" context="{'default_ticket_id': id}"
+                           domain="[('ticket_id','=', id)]"
+                           mode="list,form"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
