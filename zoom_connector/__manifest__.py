@@ -15,7 +15,6 @@
         - Integración con Helpdesk (tickets)
     """,
 	"author": "TechSolutions",
-	"website": "https://www.linkedin.com/in/wpadilla/",
 	"price": "24.99",
 	"currency": "USD",
 	"depends": [
